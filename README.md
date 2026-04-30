@@ -2,6 +2,8 @@
 
 A minimal TOTP authenticator for Linux. A background daemon keeps your secrets encrypted on disk and generates codes on demand. A CLI lets you import accounts and copy codes to the clipboard. An optional Quickshell panel gives you a searchable visual interface with live countdown timers.
 
+![Quickshell demo](assets/demo.gif)
+
 ---
 
 ## Getting started
@@ -76,10 +78,10 @@ systemctl --user enable --now totp.service
 
 Your accounts and master key are stored in your home directory:
 
-| File | Contents |
-|------|---------|
-| `~/.local/share/totp/accounts.enc` | Encrypted account store |
-| `~/.local/share/totp/master.key` | Master key (readable only by your user) |
+| File                               | Contents                                |
+| ---------------------------------- | --------------------------------------- |
+| `~/.local/share/totp/accounts.enc` | Encrypted account store                 |
+| `~/.local/share/totp/master.key`   | Master key (readable only by your user) |
 
 Both paths respect `XDG_DATA_HOME` if set. Your TOTP secrets are encrypted at rest and never leave the daemon — the CLI only ever receives account names and metadata, never secrets.
 
@@ -96,21 +98,25 @@ Both paths respect `XDG_DATA_HOME` if set. Your TOTP secrets are encrypted at re
 Both Google Authenticator export QR codes and standard single-account QR codes are supported. This requires `zbarimg` to be installed:
 
 **Arch Linux**
+
 ```bash
 sudo pacman -S zbar
 ```
 
 **Debian / Ubuntu**
+
 ```bash
 sudo apt install zbar-tools
 ```
 
 **Fedora**
+
 ```bash
 sudo dnf install zbar
 ```
 
 **macOS (Homebrew)**
+
 ```bash
 brew install zbar
 ```
@@ -146,10 +152,10 @@ totp copy <id>               # generate a code and copy it to the clipboard
 
 `totp copy` automatically uses the right clipboard tool for your session:
 
-| Session | Tool used |
-|---------|-----------|
-| Wayland | `wl-copy` |
-| X11 | `xclip` |
+| Session          | Tool used |
+| ---------------- | --------- |
+| Wayland          | `wl-copy` |
+| X11              | `xclip`   |
 | Neither detected | `wl-copy` |
 
 If you run the daemon as a systemd user service, clipboard access works automatically as long as the service starts after your graphical session.
@@ -172,11 +178,11 @@ The Quickshell panel is optional — the daemon and CLI work fully on their own.
 
 ## Dependencies
 
-| Dependency | Required for |
-|-----------|-------------|
-| Go 1.21+ | building the project |
-| `zbarimg` (zbar) | importing QR code images |
-| `zenity` | file picker in the Quickshell panel (optional) |
-| `wl-copy` (wl-clipboard) | clipboard on Wayland |
-| `xclip` | clipboard on X11 |
-| [Quickshell](https://quickshell.outfoxxed.me) | the visual panel (optional) |
+| Dependency                                    | Required for                                   |
+| --------------------------------------------- | ---------------------------------------------- |
+| Go 1.21+                                      | building the project                           |
+| `zbarimg` (zbar)                              | importing QR code images                       |
+| `zenity`                                      | file picker in the Quickshell panel (optional) |
+| `wl-copy` (wl-clipboard)                      | clipboard on Wayland                           |
+| `xclip`                                       | clipboard on X11                               |
+| [Quickshell](https://quickshell.outfoxxed.me) | the visual panel (optional)                    |

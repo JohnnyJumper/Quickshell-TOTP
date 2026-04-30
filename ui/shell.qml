@@ -31,6 +31,7 @@ ShellRoot {
         property string importFeedback: ""
         property bool importSucceeded: false
         property string toastMessage: ""
+        property bool daemonRunning: true
 
         property var filtered: {
             const q = query.toLowerCase();
@@ -101,10 +102,10 @@ ShellRoot {
             id: listProc
             command: ["totp", "list"]
             property string buf: ""
-            stdout: SplitParser {
-                onRead: line => listProc.buf += line
-            }
+            stdout: SplitParser { onRead: line => listProc.buf += line }
+            stderr: SplitParser { onRead: _ => {} }
             onExited: (code) => {
+                panel.daemonRunning = (code === 0);
                 if (code === 0 && listProc.buf !== "") {
                     try { panel.accounts = JSON.parse(listProc.buf); } catch (e) {}
                 }
@@ -400,14 +401,31 @@ ShellRoot {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            Text {
+                            Column {
                                 anchors.centerIn: parent
                                 visible: panel.filtered.length === 0
-                                text: panel.accounts.length === 0
-                                    ? "No accounts imported"
-                                    : "No results for \"" + panel.query + "\""
-                                color: "#3f3f46"
-                                font.pixelSize: 14
+                                spacing: 8
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: !panel.daemonRunning
+                                        ? "Daemon is not running"
+                                        : panel.accounts.length === 0
+                                            ? "No accounts imported"
+                                            : "No results for \"" + panel.query + "\""
+                                    color: !panel.daemonRunning ? "#fca5a5" : "#3f3f46"
+                                    font.pixelSize: 14
+                                    font.weight: !panel.daemonRunning ? Font.Medium : Font.Normal
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    visible: !panel.daemonRunning
+                                    text: "run: totp daemon"
+                                    color: "#52525b"
+                                    font.pixelSize: 12
+                                    font.family: "monospace"
+                                }
                             }
 
                             ListView {

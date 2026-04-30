@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"totp/internal/daemon"
 	"totp/internal/ipc"
@@ -72,15 +73,12 @@ func runList() error {
 		return err
 	}
 
-	if len(response.Accounts) == 0 {
-		fmt.Println("No accounts imported.")
-		return nil
+	data, err := json.Marshal(response.Accounts)
+	if err != nil {
+		return err
 	}
 
-	for _, account := range response.Accounts {
-		fmt.Printf("%s\t%s\t%s\n", account.ID, account.Issuer, account.Label)
-	}
-
+	fmt.Println(string(data))
 	return nil
 }
 

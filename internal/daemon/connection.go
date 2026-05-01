@@ -3,6 +3,7 @@ package daemon
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net"
 	"totp/internal/ipc"
 )
@@ -12,14 +13,19 @@ func handleConnection(conn net.Conn) {
 
 	var request ipc.Request
 	if err := json.NewDecoder(conn).Decode(&request); err != nil {
+		log.Printf("decode request: %v", err)
 		_ = ipc.WriteResponse(conn, ipc.Failure(err))
 		return
 	}
 
 	response := handleRequest(request)
 
+	if !response.OK {
+		log.Printf("[%s] error: %s", request.Type, response.Error)
+	}
+
 	if err := ipc.WriteResponse(conn, response); err != nil {
-		fmt.Println("Failed to write Response: %w", err)
+		log.Printf("write response: %v", err)
 	}
 }
 

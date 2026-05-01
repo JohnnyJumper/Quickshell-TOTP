@@ -2,6 +2,7 @@ package daemon
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -39,12 +40,12 @@ func Run() error {
 		return fmt.Errorf("set socket permissions: %w", err)
 	}
 
-	fmt.Printf("totp daemon running at %s\n", socketPath)
+	log.Printf("totp daemon running at %s", socketPath)
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			return fmt.Errorf("accept connection: %w", err)
+			return err
 		}
 
 		go handleConnection(conn)

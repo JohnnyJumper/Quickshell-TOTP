@@ -156,18 +156,24 @@ func handleCopyCode(request ipc.Request) ipc.Response {
 
 func clipboardCopy(text string) error {
 	var cmd *exec.Cmd
+
 	switch {
 	case os.Getenv("WAYLAND_DISPLAY") != "":
 		cmd = exec.Command("wl-copy")
+
 	case os.Getenv("DISPLAY") != "":
 		cmd = exec.Command("xclip", "-selection", "clipboard")
+
 	default:
-		cmd = exec.Command("wl-copy")
+		return fmt.Errorf("no clipboard backend available: WAYLAND_DISPLAY and DISPLAY are both unset")
 	}
+
 	cmd.Stdin = strings.NewReader(text)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
 	return cmd.Run()
 }
-
 func mergeAccounts(existing []store.Account, imported []store.Account) []store.Account {
 	accountsByID := make(map[string]store.Account, len(existing)+len(imported))
 
